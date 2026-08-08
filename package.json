@@ -1,0 +1,18 @@
+{
+  "name": "task-api",
+  "version": "4.0.0",
+  "description": "CRUD task API with swappable storage, secured with Supabase Auth",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "redis": "^4.7.0",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

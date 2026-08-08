@@ -1,0 +1,203 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Task API",
+    "version": "4.0.0",
+    "description": "CRUD task API with swappable storage, secured with Supabase Auth"
+  },
+  "servers": [{ "url": "http://localhost:3000" }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "summary": "Create a new user account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created" },
+          "400": { "description": "Missing email or password, or Supabase rejected the signup" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Authenticate and receive a JWT",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "access_token, refresh_token, and user" },
+          "400": { "description": "Missing email or password" },
+          "401": { "description": "Invalid login credentials" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "End the current session",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Logged out" },
+          "401": { "description": "Missing, malformed, or invalid token" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Exchange a refresh token for a new access token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "refresh_token": { "type": "string" } },
+                "required": ["refresh_token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "New access_token and refresh_token" },
+          "400": { "description": "Missing refresh_token" },
+          "401": { "description": "Invalid or expired refresh token" }
+        }
+      }
+    },
+    "/public/info": {
+      "get": {
+        "summary": "Public, unauthenticated data",
+        "responses": { "200": { "description": "Welcome message" } }
+      }
+    },
+    "/protected/profile": {
+      "get": {
+        "summary": "Read the authenticated user's profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "id, email, created_at" },
+          "401": { "description": "Missing, malformed, or invalid/expired token" }
+        }
+      }
+    },
+    "/protected/dashboard": {
+      "get": {
+        "summary": "Second protected route, reuses the same auth middleware",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Welcome message" },
+          "401": { "description": "Missing, malformed, or invalid/expired token" }
+        }
+      }
+    },
+    "/protected/admin": {
+      "get": {
+        "summary": "Admin-only route, demonstrates 401 vs 403",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Welcome message" },
+          "401": { "description": "Missing, malformed, or invalid/expired token" },
+          "403": { "description": "Authenticated but not an admin" }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "summary": "List tasks",
+        "parameters": [
+          { "name": "done", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "sort", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Array of tasks" } }
+      },
+      "post": {
+        "summary": "Create a task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "title": { "type": "string" }, "done": { "type": "boolean" } },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Task created" }, "400": { "description": "Missing or empty title" } }
+      }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "summary": "Get a task by id",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Task" }, "404": { "description": "Task not found" } }
+      },
+      "put": {
+        "summary": "Update a task",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "title": { "type": "string" }, "done": { "type": "boolean" } },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Task updated" },
+          "400": { "description": "Missing or empty title" },
+          "404": { "description": "Task not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a task",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "204": { "description": "Task deleted" }, "404": { "description": "Task not found" } }
+      }
+    },
+    "/stats": { "get": { "summary": "Task statistics", "responses": { "200": { "description": "total, done, open counts" } } } },
+    "/reset": { "post": { "summary": "Reset to the 3 example tasks", "responses": { "200": { "description": "Reset confirmation" } } } },
+    "/health": { "get": { "summary": "Health check, includes a repository ping", "responses": { "200": { "description": "status ok" } } } }
+  }
+}
