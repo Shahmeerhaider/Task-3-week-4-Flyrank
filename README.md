@@ -103,8 +103,7 @@ which variables to set, without ever seeing a real secret.
 ### With Docker (recommended)
 
 ```bash
-cp .env.example .env
-# edit .env: paste your real SUPABASE_URL and SUPABASE_KEY
+
 docker compose up
 ```
 
@@ -120,8 +119,6 @@ The API is then available at `http://localhost:3000`.
 
 ```bash
 npm install
-cp .env.example .env
-# edit .env with your Supabase credentials, and optionally DATABASE_URL
 npm start
 ```
 
@@ -230,6 +227,11 @@ and use **Try it out** directly against `/protected/profile` from the
 browser — no curl required. Take a screenshot of this for your own
 submission, showing the lock icons and a successful authorized call.
 
+
+<img width="1920" height="987" alt="image" src="https://github.com/user-attachments/assets/5cd2eb6e-1ed8-425e-8641-43e672fb26f4" />
+
+
+
 ## Stretch goals implemented
 
 - **401 vs 403**: `/protected/admin` is reachable by any authenticated
@@ -282,6 +284,11 @@ with:
 api-1 exited with code 1
 Error: connect ECONNREFUSED 172.18.0.3:5432
 ```
+
+
+<img width="1325" height="620" alt="image" src="https://github.com/user-attachments/assets/6a9b2f08-a7a6-4bef-bfa5-59416b815851" />
+
+
 
 This happened because the original `compose.yaml` used a plain
 `depends_on` list, which only waits for a container to start, not for
