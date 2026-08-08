@@ -7,6 +7,7 @@ const { pingRedis } = require("./src/redis");
 
 const PORT = process.env.PORT || 3000;
 
+
 async function start() {
   const repository = getTaskRepository();
   await repository.init();
